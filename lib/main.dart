@@ -23,24 +23,28 @@ class Calculator extends StatefulWidget {
 
 class _CalculatorState extends State<Calculator> {
   dynamic text = '0';
-  Widget calcbutton(String btntxt, Color btncolor, Color txtcolor) {
+  double numOne = 0;
+  double numTwo = 0;
+
+  dynamic result = '';
+  dynamic finalResult = '';
+  dynamic operator = '';
+  dynamic preOperator = '';
+
+  // Button creation function
+  Widget calcButton(String btnTxt, Color btnColor, Color txtColor) {
     return Container(
       child: ElevatedButton(
-        onPressed: (){
-          //TODO: add function for button press
-          calculation(btntxt);
-        },
-        child: Text('$btntxt',
-          style: TextStyle(
-            fontSize: 30,
-            color: txtcolor,
-          ),
+        onPressed: () => buttonPressed(btnTxt),
+        child: Text(
+          btnTxt,
+          style: TextStyle(fontSize: 30, color: txtColor),
         ),
         style: ElevatedButton.styleFrom(
           shape: CircleBorder(),
-          primary: btncolor,
+          primary: btnColor,
           padding: EdgeInsets.all(20),
-          minimumSize: Size(90,90),
+          minimumSize: Size(90, 90),
         ),
       ),
     );
@@ -59,201 +63,185 @@ class _CalculatorState extends State<Calculator> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            // calculator display
+            // Calculator display
             SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Padding(padding: const EdgeInsets.all(10.0),
-                      child:Text('$text',
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text(
+                      '$text',
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 100,
                       ),
-                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 10,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                calcbutton('AC',Colors.grey[300]!,Colors.black),
-                calcbutton('+/-',Colors.grey[300]!,Colors.black),
-                calcbutton('%',Colors.grey[300]!,Colors.black),
-                calcbutton('/',Colors.amber[700]!,Colors.white),
-              ],
-            ),
-            SizedBox(height: 10,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                calcbutton('7',Colors.grey[850]!,Colors.black),
-                calcbutton('8',Colors.grey[850]!,Colors.black),
-                calcbutton('9',Colors.grey[850]!,Colors.black),
-                calcbutton('x',Colors.amber[700]!,Colors.white),
-              ],
-            ),
-            SizedBox(height: 10,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                calcbutton('4',Colors.grey[850]!,Colors.black),
-                calcbutton('5',Colors.grey[850]!,Colors.black),
-                calcbutton('6',Colors.grey[850]!,Colors.black),
-                calcbutton('-',Colors.amber[700]!,Colors.white),
-              ],
-            ),   SizedBox(height: 10,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                calcbutton('3',Colors.grey[850]!,Colors.black),
-                calcbutton('2',Colors.grey[850]!,Colors.black),
-                calcbutton('1',Colors.grey[850]!,Colors.black),
-                calcbutton('+',Colors.amber[700]!,Colors.white),
-              ],
-            ),
-            SizedBox(height: 10,),
-// last row with 0 button
-      Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-      ElevatedButton(
-        onPressed: () {
-          // button function
-        },
-        style: ElevatedButton.styleFrom(
-          shape: StadiumBorder(),
-       //   padding: EdgeInsets.fromLTRB(34, 28, 128, 20),
-          minimumSize: Size(180, 90),
-          primary: Colors.grey[900]!,
-        ),
-        child: Center(
-          child: Text(
-            '0',
-            style: TextStyle(
-              fontSize: 30,
-              color: Colors.white,
-            ),
-            textAlign: TextAlign.center, // center the text horizontally
-          ),
-        ),
-      ),
-    calcbutton('.',Colors.grey[850]!,Colors.white),
-    calcbutton('=',Colors.amber[700]!,Colors.white),
-  ],
-),
-            SizedBox(height: 10,),
+            SizedBox(height: 10),
+            // Calculator buttons
+            buildCalcButtonRow(['AC', '+/-', '%', '/'], Colors.grey[300]!, Colors.black),
+            buildCalcButtonRow(['7', '8', '9', 'x'], Colors.grey[850]!, Colors.black),
+            buildCalcButtonRow(['4', '5', '6', '-'], Colors.grey[850]!, Colors.black),
+            buildCalcButtonRow(['3', '2', '1', '+'], Colors.grey[850]!, Colors.black),
+            buildLastRow(),
           ],
         ),
       ),
     );
   }
-  // Calculator Logic
-//dynamic text = '0';
-double numOne = 0;
-double numTwo = 0;
 
-dynamic result = '';
-dynamic finalResult = '';
-dynamic operator = '';
-dynamic preOperator = '';
+  // Refactored to build button rows
+  Row buildCalcButtonRow(List<String> buttonLabels, Color btnColor, Color txtColor) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: buttonLabels.map((label) => calcButton(label, btnColor, txtColor)).toList(),
+    );
+  }
 
-void calculation(btnText) {
+  // Last row with 0 button
+  Row buildLastRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        ElevatedButton(
+          onPressed: () => buttonPressed('0'),
+          style: ElevatedButton.styleFrom(
+            shape: StadiumBorder(),
+            minimumSize: Size(180, 90),
+            primary: Colors.grey[900]!,
+          ),
+          child: Center(
+            child: Text(
+              '0',
+              style: TextStyle(fontSize: 30, color: Colors.white),
+            ),
+          ),
+        ),
+        calcButton('.', Colors.grey[850]!, Colors.white),
+        calcButton('=', Colors.amber[700]!, Colors.white),
+      ],
+    );
+  }
 
-  if (btnText == 'AC') {
-    text = '0';
-    numOne = 0;
-    numTwo = 0;
-    result = 0;
-    finalResult = 0;
-    operator = '';
-    preOperator = '';
-
-  } else if (operator == '=' && btnText == '=') {
-
-    if (preOperator == '+') {
-      finalResult = add();
-    } else if (preOperator == '-') {
-      finalResult = sub();
-    } else if (preOperator == 'x') {
-      finalResult = mul();
-    } else if (preOperator == '/') {
-      finalResult = div();
+  // Handle button press and route to appropriate function
+  void buttonPressed(String btnText) {
+    if (btnText == 'AC') {
+      clearAll();
+    } else if (btnText == '+/-') {
+      toggleSign();
+    } else if (btnText == '.' || btnText == '%') {
+      handleSpecialInput(btnText);
+    } else if (isOperator(btnText)) {
+      processOperator(btnText);
+    } else if (btnText == '=') {
+      calculateResult();
+    } else {
+      appendNumber(btnText);
     }
+  }
 
-  }else if(btnText == '+' || btnText == '-' || btnText == 'x' || btnText == '/' || btnText == '='){
+  // Helper function to check if the button is an operator
+  bool isOperator(String btnText) {
+    return btnText == '+' || btnText == '-' || btnText == 'x' || btnText == '/';
+  }
 
-    if(numOne == 0){
+  // Clear all inputs
+  void clearAll() {
+    setState(() {
+      text = '0';
+      numOne = 0;
+      numTwo = 0;
+      result = '';
+      operator = '';
+      finalResult = '';
+    });
+  }
+
+  // Handle number input
+  void appendNumber(String btnText) {
+    setState(() {
+      result += btnText;
+      finalResult = result;
+      text = finalResult;
+    });
+  }
+
+  // Toggle between positive and negative sign
+  void toggleSign() {
+    setState(() {
+      result.toString().startsWith('-')
+          ? result = result.toString().substring(1)
+          : result = '-' + result.toString();
+      finalResult = result;
+      text = finalResult;
+    });
+  }
+
+  // Handle special inputs like decimal point and percentage
+  void handleSpecialInput(String btnText) {
+    if (btnText == '.') {
+      if (!result.toString().contains('.')) {
+        setState(() {
+          result += '.';
+          finalResult = result;
+          text = finalResult;
+        });
+      }
+    } else if (btnText == '%') {
+      setState(() {
+        result = (numOne / 100).toString();
+        finalResult = result;
+        text = finalResult;
+      });
+    }
+  }
+
+  // Process operator input and handle calculations
+  void processOperator(String btnText) {
+    if (operator.isEmpty) {
       numOne = double.parse(result);
-    }else{
+    } else {
       numTwo = double.parse(result);
+      calculateResult();
     }
-
-    if (operator == '+') {
-      finalResult = add();
-    } else if (operator == '-') {
-      finalResult = sub();
-    } else if (operator == 'x') {
-      finalResult = mul();
-    } else if (operator == '/') {
-      finalResult = div();
-    }
-    preOperator = operator;
     operator = btnText;
     result = '';
-  }else if(btnText == '%'){
-    result = numOne / 100;
-    finalResult = doesContainDecimal(result);
-  }else if(btnText == '.'){
-    if(!result.toString().contains('.')){
-      result = result.toString() + '.';
+  }
+
+  // Perform calculation based on the operator
+  void calculateResult() {
+    switch (operator) {
+      case '+':
+        finalResult = add();
+        break;
+      case '-':
+        finalResult = subtract();
+        break;
+      case 'x':
+        finalResult = multiply();
+        break;
+      case '/':
+        finalResult = divide();
+        break;
+      default:
+        finalResult = result;
     }
-    finalResult = result;
+    setState(() {
+      text = finalResult;
+      result = finalResult;
+      operator = '';
+    });
+  }
 
-  }else if(btnText == '+/-'){
-
-    result.toString().startsWith('-') ? result = result.toString().substring(1): result = '-' + result.toString();
-    finalResult = result;
-  }else{
-    result = result + btnText;
-    finalResult = result;
-  }
-  setState(() {
-    text = finalResult;
-  });
-}
-
-String add(){
-  result = (numOne+numTwo).toString();
-  numOne = double.parse(result);
-  return doesContainDecimal(result);
-}
-  String sub(){
-    result = (numOne-numTwo).toString();
-    numOne = double.parse(result);
-    return doesContainDecimal(result);
-  }
-  String div(){
-    result = (numOne/numTwo).toString();
-    numOne = double.parse(result);
-    return doesContainDecimal(result);
-  }
-  String mul(){
-    result = (numOne*numTwo).toString();
-    numOne = double.parse(result);
-    return doesContainDecimal(result);
-  }
-  String doesContainDecimal(dynamic result) {
-    if (result.toString().contains('.')) {
-      List<String> splitDecimal = result.toString().split('.');
-      if (!(int.parse(splitDecimal[1]) > 0)) {
-        return result = splitDecimal[0].toString();
-      }
-    }
-    return result;
-  }
+  // Math operation functions
+  String add() => (numOne + numTwo).toString();
+  String subtract() => (numOne - numTwo).toString();
+  String multiply() => (numOne * numTwo).toString();
+  String divide() => (numOne / numTwo).toString();
 }
