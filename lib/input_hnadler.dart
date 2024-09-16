@@ -85,3 +85,5 @@ void processOperator(String btnText, _CalculatorState state) {
   state.operator = btnText; // Set the current operator
   state.result = ''; // Clear result for next input
 }
+
+
